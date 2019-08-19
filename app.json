@@ -1,6 +1,6 @@
 {
-  "name": "Start on Heroku: Python",
-  "description": "A barebones Python app, which can easily be deployed to Heroku.",
+  "name": "Game Backend",
+  "description": "Backend-part game with no name",
   "image": "heroku/python",
   "repository": "https://github.com/Piskunov00/game-backend",
   "keywords": ["python", "django" ],
