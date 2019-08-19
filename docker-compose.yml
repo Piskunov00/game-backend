@@ -1,0 +1,29 @@
+version: "3.7"
+
+services:
+  database:
+    image: postgres:10
+    restart: always
+    ports:
+      - 5432:5432
+    volumes:
+      - ./.pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: ifrag
+      POSTGRES_USER: ifrag
+      POSTGRES_DB: ifrag
+
+  backend:
+    build:
+      context: .
+      args:
+        MODE: dev
+    env_file:
+      - .env
+    ports:
+      - 5007:80
+    volumes:
+      - ./:/src/project
+      - ./report/:/report
+    depends_on:
+      - database

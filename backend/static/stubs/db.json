@@ -1,0 +1,27 @@
+{
+    "GamerCollection": [
+        {
+            "name": "ifrag",
+            "password": "pbkdf2_sha256$150000$UCAuW5T8eTVW$6J6womx3zll0xiWRTepp7IzIu7k/eoXgcelW/4rpGV0=",
+            "birthday": "2000-06-12",
+            "sex": -1,
+            "money": 80000,
+            "rating": 610515,
+            "is_superuser": true
+        },
+        {
+            "name": "rozanovasya",
+            "password": "pbkdf2_sha256$150000$VwKI7PBrdqHE$weQ5ypEQ+Xphr8pe4VqyslaqGV3PW8iX+VAb6JYKJM0=",
+            "birthday": "1999-10-18",
+            "sex": 1,
+            "is_superuser": true
+        },
+        {
+            "name": "wall-e",
+            "password": "pbkdf2_sha256$150000$clJFz1xp1fgF$DN2aG8WQuLBBLoKTonRR0AWWuVOV88AJJwhn40CgOhM=",
+            "birthday": "2019-08-11",
+            "sex": 0,
+            "is_superuser": true
+        }
+    ]
+}
