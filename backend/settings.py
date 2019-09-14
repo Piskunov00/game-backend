@@ -38,11 +38,13 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "api",
+    "tmp_name",
+    "tic_tac_toy",
+    "utils",
 ]
 
 MIDDLEWARE = [
-    'api.utils.auth.MyTokenMiddleware',
+    'utils.middleware.MyTokenMiddleware',
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -53,7 +55,7 @@ MIDDLEWARE = [
 ]
 if os.getenv('IS_TESTING'):
     pass
-    # MIDDLEWARE.append('api.utils.auth.TestMiddleware')
+    # MIDDLEWARE.append('tmp_name.utils.auth.TestMiddleware')
 
 ROOT_URLCONF = "backend.urls"
 
@@ -137,7 +139,7 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
 
-AUTH_USER_MODEL = 'api.Gamer'
+AUTH_USER_MODEL = 'utils.User'
 
 JWT_AUTH = {
     'JWT_VERIFY': True,
@@ -145,6 +147,8 @@ JWT_AUTH = {
     'JWT_EXPIRATION_DELTA': datetime.timedelta(hours=1),
     'JWT_AUTH_HEADER_PREFIX': 'Bearer',
 }
+
+CUR_HOST = os.getenv('CUR_HOST') or 'localhost'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -172,3 +176,11 @@ OUTPUTTER_PARAMS = {
         'text',
     ],
 }
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_FILE_PATH = '/src'
+EMAIL_HOST = os.getenv('SMTP_SERVER')
+EMAIL_USE_TLS = True
+EMAIL_PORT = int(os.getenv('PORT_EMAIL'))
+EMAIL_HOST_USER = os.getenv('LOGIN_EMAIL')
+EMAIL_HOST_PASSWORD = os.getenv('PASSWORD_EMAIL')
