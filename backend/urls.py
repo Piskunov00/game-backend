@@ -2,15 +2,18 @@ from django.urls import path, include
 
 from django.contrib import admin
 
+from tmp_name.views import (
+    tofront,
+    outgame,
+)
+
+
 admin.autodiscover()
 
-import api.views.tofront
-import api.views.outgame
-
-
 urlpatterns = [
-    path('', include('api.urls')),
+    path('tmp_name/', include('tmp_name.urls', namespace='tmp_name')),
+    path('tic-tac-toy/', include('tic_tac_toy.urls', namespace='tic_tac_toy')),
 
-    path("", api.views.tofront.index, name="index"),
+    path("", tofront.index, name="index"),
     path("admin/", admin.site.urls),
 ]

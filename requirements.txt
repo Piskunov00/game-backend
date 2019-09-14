@@ -13,6 +13,7 @@ ipython
 attr
 tabulate
 pandas
+markdown
 django-service-objects
 djangorestframework
 djangorestframework-jwt

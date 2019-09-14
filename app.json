@@ -1,16 +1,11 @@
 {
-  "name": "Game Backend",
-  "description": "Backend-part game with no name",
+  "name": "ifrag backend",
+  "description": "Python backend for android games",
   "image": "heroku/python",
   "repository": "https://github.com/Piskunov00/game-backend",
   "keywords": ["python", "django" ],
   "addons": [ "heroku-postgresql" ],
-  "env": {
-    "SECRET_KEY": {
-      "description": "The secret key for the Django application.",
-      "generator": "secret"
-    }
-  },
+  "env": {},
   "environments": {
     "test": {
       "scripts": {
