@@ -32,6 +32,7 @@ def create_game(request):
             status=201,
         )
     except HttpRequestException as e:
+        logger.exception(e)
         return e.response
 
 
@@ -151,6 +152,7 @@ def kill_run_game(request):
         check_request(
             request=request,
             stage=Stage.ONLY_AUTHENTICATING,
+            method='POST',
         )
         player = request.user
 
@@ -183,7 +185,7 @@ def send_message(request):
         gg = MagicOrder('\
         gg')(
             validators.GiGDetail.validate(player)
-        )
+        )[0]
 
         actions.SendMessage.execute(
             gg, data['text'],

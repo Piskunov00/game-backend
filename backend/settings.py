@@ -44,14 +44,13 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'utils.middleware.MyTokenMiddleware',
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
-    "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    'utils.middleware.MyTokenMiddleware',
 ]
 if os.getenv('IS_TESTING'):
     pass
@@ -154,27 +153,6 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
     ),
-}
-
-OUTPUTTER_PARAMS = {
-    'GIG': [
-        ('name', 'gamer.name'),
-        'latitude',
-        'longitude',
-        'color',
-        'radius',
-    ],
-    'COIN': [
-        'latitude',
-        'longitude',
-        'cost',
-        'size',
-    ],
-    'MESSAGE': [
-        ('from', 'gg.gamer.name'),
-        ('color', 'gg.color'),
-        'text',
-    ],
 }
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

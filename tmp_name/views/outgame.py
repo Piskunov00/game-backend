@@ -9,8 +9,6 @@ from utils.auth import authenticate, login
 from re import search
 from datetime import datetime
 
-from django.views.decorators.csrf import csrf_exempt
-
 
 def show_users(request):
     lst = Gamer.objects.all()
@@ -60,13 +58,12 @@ def sign_in(request):
     )
 
 
-@csrf_exempt
 def sign_up(request):
     data = request.POST
     if Gamer.objects.filter(user__username=data['name']).count():
         return HttpResponse(
             reason='Login already exists',
-            status=400,
+            status=211,
         )
     birthday = data.get('birthday', None)
     if birthday:
@@ -138,12 +135,12 @@ def get_top_users(request):
     search_ = get['search']
     return http_wrapper([
         {
-            'name': gamer.name,
+            'name': gamer.user.username,
             'rating': gamer.rating,
             'mileage': gamer.mileage,
         }
         for gamer in Gamer.objects.all()
-        if check(search_, reg, gamer.name)
+        if check(search_, reg, gamer.user.username)
     ][:50])
 
 

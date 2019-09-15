@@ -13,8 +13,13 @@ def choicer(origin):
 
         def __gt__(self, other):
             if not hasattr(other, '_weight'):
-                raise NotImplemented
+                raise NotImplementedError
             return self._weight > other._weight
+
+        def __ge__(self, other):
+            if not hasattr(other, '_weight'):
+                raise NotImplementedError
+            return self._weight >= other._weight
 
         def __str__(self):
             return str(self._value)

@@ -16,14 +16,11 @@ from time import time
 from tmp_name.business.functions import coin_distribution
 from tmp_name.utils.geo import calc_distance
 from tmp_name.business.functions import is_catch
-from utils import Outputter
 import logging
 
-StatusGameChoices = Game.StatusGameChoices
-StatusGiGChoices = GiG.StatusGiGChoices
+from tmp_name.models import StatusGameChoices
 
 logger = logging.getLogger(__name__)
-my_lazy = Outputter()
 
 
 class Action(object):
@@ -156,21 +153,38 @@ class UpdateGame(Action):
             player=player,
         )
 
-        if game.status >= StatusGameChoices.FINISHED:
+        if game.is_finished:
             return {
                 'stats': {
                     'coins': cls._getting_coins(player, game, gg),  # Полученная сумма
                 }
             }
         else:
+            def is_author(gamer: Gamer, game: Game):
+                return GiG.objects.filter(
+                    gamer=gamer,
+                    game=game,
+                    chief=True,
+                ).count() == 1
+
+            def _change(dct):
+                dct['name'] = dct.pop('gamer__user__username')
+                return dct
+
             def hydrate(dct):
                 return {key: val for key, val in dct.items() if val is not None}
 
             return hydrate({
-                'gamers': my_lazy(GiG.objects.filter(game=game)),  # Список игроков
+                'gamers': list(map(_change, GiG.objects.filter(game=game).values(
+                    'gamer__user__username',
+                    'latitude',
+                    'longitude',
+                    'color',
+                    'radius',
+                ))),  # Список игроков
                 'link': game.link,  # 4 цифры
-                'progress': int(game.is_run),  # 0 или 1
-                'author': game.author == player,  # true или false
+                'progress': int(game.is_started),  # 0 или 1
+                'author': is_author(player, game),  # true или false
                 'type_game': game.type_game,  # [0, 1, 2]
                 'timer': cls._get_timer(game),  # Количество секунд
                 'coins': cls._get_coins(game, data['coins']),  # Список монет
@@ -179,7 +193,8 @@ class UpdateGame(Action):
 
     @staticmethod
     def _increase_mileage(game, player, latitude, longitude):
-        if game.is_run:
+        if game.is_started:
+            gg = GiG.objects.get(game=game, gamer=player)
             player.mileage += calc_distance(
                 gg.latitude,
                 gg.longitude,
@@ -221,23 +236,37 @@ class UpdateGame(Action):
     @staticmethod
     def _get_timer(game):
         if game.time_end_game:
-            return game.time_end_game - time()
+            return int(game.time_end_game - time())
 
     @staticmethod
     def _get_coins(game, coins):
-        cur_cnt_coins = Coin.objects.filter(game=game, taken=False).count()
-        if coins != cur_cnt_coins:
-            return my_lazy(Coin.objects.filter(game=game, taken=False))
+        qs = Coin.objects.filter(game=game, taken=False)
+        if coins != qs.count():
+            return list(qs.values(
+                'latitude',
+                'longitude',
+                'cost',
+                'size',
+            ))
 
     @staticmethod
     def _get_messages(game, messages):
-        cur_cnt_messages = Message.objects.filter(gg__game=game).count()
-        if messages != cur_cnt_messages:
-            return my_lazy(
-                Message
-                    .objects
-                    .filter(gg__game=game)
-                    .order_by('date')
+        def _change(dct):
+            dct['from'] = dct.pop('gg__gamer__user__username')
+            dct['color'] = dct.pop('gg__color')
+            return dct
+
+        qs = Message.objects.filter(gg__game=game).order_by('date')
+        if messages != qs.count():
+            return list(
+                map(
+                    _change,
+                    qs.values(
+                        'gg__gamer__user__username',
+                        'gg__color',
+                        'text',
+                    )
+                )
             )[messages:]
 
 
@@ -264,7 +293,7 @@ class SendMessage(Action):
 class CheckGame(Action):
     @classmethod
     def execute(cls, player):
-        gg = GiG.objects.filter(gamer=player).count()
+        gg = GiG.objects.filter(gamer=player).first()
         if not gg:
             return {'result': 1}
         game: Game = gg.game
@@ -272,8 +301,12 @@ class CheckGame(Action):
         return {
             'result': 2,
             'link': int(game.link),
-            'own': int(game.author == player),
-            'run': int(game.started),
+            'own': int(GiG.objects.filter(
+                gamer=player,
+                game=game,
+                chief=True
+            ).count() == 1),
+            'run': int(game.is_started),
         }
 
 

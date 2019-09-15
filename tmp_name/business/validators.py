@@ -19,8 +19,6 @@ from django.db.models import Q
 
 from tmp_name.exceptions import HttpRequestException
 
-from tmp_name.models import StatusGameChoices, StatusGiGChoices
-
 
 class Validator(object):
 
@@ -88,7 +86,7 @@ class SyncGame(Validator):
             active = reduce(lambda q, v: q | v, [
                 Q(status=Game.StatusGameChoices.CREATED),
                 Q(status=Game.StatusGameChoices.INITIALIZED),
-                Q(status=Game.StatusGameChoices.CREATED),
+                Q(status=Game.StatusGameChoices.STARTED),
             ], Q())
             return Game.objects.get(
                 active,
@@ -110,7 +108,7 @@ class BeginGame(SyncGame):
     def validate(cls, player: Gamer):
         game, all_gamers = super().validate(player).values()
 
-        if StatusGameChoices.convert(game.status) > StatusGameChoices.INITIALIZED:
+        if game.is_initialized:
             raise HttpRequestException(
                 class_error=HttpResponseForbidden,
                 reason='Game already started',

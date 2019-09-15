@@ -3,7 +3,6 @@ from tmp_name.utils.geo import calc_distance
 
 from tmp_name.forms import *
 from tmp_name.models import BotGame, Gamer
-from django.views.decorators.csrf import csrf_exempt
 from django.http import (
     JsonResponse,
     HttpResponse,
@@ -17,7 +16,6 @@ from django.views.decorators.http import (
 from time import time
 
 
-@csrf_exempt
 @require_POST
 def kill_gwb(request):
     game = BotGame.objects.filter(gamer=request.user).first()
@@ -29,7 +27,6 @@ def kill_gwb(request):
     return HttpResponse('Ok')
 
 
-@csrf_exempt
 @require_POST
 def update_gwb(request):
     form = UpdateGameWithBot(request.POST)
@@ -103,7 +100,6 @@ def get_my_speed_gwb(request):
     )
 
 
-@csrf_exempt
 @require_POST
 def create_gwb(request):
     request.user = Gamer.objects.get(name='ifrag')

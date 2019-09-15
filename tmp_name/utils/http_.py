@@ -39,44 +39,12 @@ def check_request(request, class_form=None, method='GET', stage=Stage.FULL):
         retval = form.cleaned_data
 
     if stage['authenticated']:
-        token = dict(request.headers).get('Token')
-        if token:
-            request.user = auth_with_token(token)
-        elif not request.user.user.is_authenticated:
+        if not request.user.is_authenticated:
             raise HttpRequestException(
                 class_error=HttpResponse,
                 reason='Unauthorized',
                 status=401,
             )
+        request.user = Gamer.objects.get(user=request.user)
 
     return retval
-
-
-def auth_with_token(token):
-    try:
-        payload = jwt_decode_handler(token)
-        username = jwt_get_username_from_payload(payload)
-        return Gamer.objects.get(name=username)
-    except ObjectDoesNotExist:
-        raise HttpRequestException(
-            class_error=Http404,
-            reason='User does not exist',
-        )
-    except MultipleObjectsReturned:
-        raise HttpRequestException(
-            class_error=HttpResponseServerError,
-            reason='In the problem database: there were two identical logins',
-        )
-    except Exception as e:
-        if str(e) == 'Signature has expired':
-            response = HttpResponseRedirect(
-                redirect_to=reverse('tmp_name:sign_in'),
-                reason='Token is out of date, go through authorization again',
-            )
-            raise HttpRequestException(
-                ready_response=response,
-            )
-        raise HttpRequestException(
-            class_error=HttpResponseForbidden,
-            reason='Invalid Token',
-        )

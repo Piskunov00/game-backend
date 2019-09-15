@@ -30,6 +30,18 @@ class Game(models.Model):
         ARCHIVED = 'AR'
         _order = [CREATED, INITIALIZED, STARTED, FINISHED, ARCHIVED]
 
+    @property
+    def is_started(self):
+        return StatusGameChoices.convert(self.status) >= StatusGameChoices.STARTED
+
+    @property
+    def is_finished(self):
+        return StatusGameChoices.convert(self.status) >= StatusGameChoices.FINISHED
+
+    @property
+    def is_initialized(self):
+        return StatusGameChoices.convert(self.status) > StatusGameChoices.INITIALIZED
+
     link = models.CharField(unique=True, max_length=4)
     duration = models.IntegerField(null=True)
     type_game = models.IntegerField()
@@ -64,7 +76,7 @@ class BotGame(models.Model):
     user_long = models.FloatField()
 
     def __str__(self):
-        return '{}\'s game'.format(self.gamer.name)
+        return '{}\'s game'.format(self.gamer.user.username)
 
 
 class GiG(models.Model):
@@ -85,7 +97,7 @@ class GiG(models.Model):
         default='AC',
     )
     color = models.IntegerField()
-    radius = models.IntegerField(null=True)
+    radius = models.IntegerField(default=1)
     chief = models.BooleanField(default=False)
 
     def __str__(self):
