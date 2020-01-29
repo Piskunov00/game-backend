@@ -45,3 +45,6 @@ GWB_MODE_URLS = [
 for package in [OUTGAME_URLS, ONLINE_MODE_URLS, GWB_MODE_URLS]:
     for pattern, view in package:
         urlpatterns.append(path(pattern, view))
+
+from test_engine import views
+urlpatterns.append(path('qwe', views.check_headers))
